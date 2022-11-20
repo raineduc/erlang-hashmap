@@ -1,0 +1,11 @@
+.idea/
+out/
+*.iml
+
+# binaries
+src/**/*.beam
+src/**/*.exe
+test/**/*.beam
+
+# rebar
+_build/

@@ -5,8 +5,8 @@
 -opaque map_oa(Key, Value) ::
     #map{storage :: array:array({Key, Value}), occupied :: integer()}.
 
--export([new/0, from_list/1, is_map_oa/1, get_value/2, add_elem/3, remove_elem/2, filter/2, fold/3,
-         map/2, merge/2, is_equal/2]).
+-export([new/0, from_list/1, is_map_oa/1, get_value/2, add_elem/3, remove_elem/2,
+         filter/2, fold/3, map/2, merge/2, is_equal/2]).
 
 -export_type([map_oa/2]).
 
@@ -31,8 +31,10 @@ add_elem(Key, Value, #map{storage = Array, occupied = Occupied}) ->
                 Array
         end,
     case put_elem({Key, Value}, ResizedArray) of
-        {already_exists, ReturnedArray} -> #map{storage = ReturnedArray, occupied = Occupied};
-        {ok, ReturnedArray} -> #map{storage = ReturnedArray, occupied = Occupied + 1}
+        {already_exists, ReturnedArray} ->
+            #map{storage = ReturnedArray, occupied = Occupied};
+        {ok, ReturnedArray} ->
+            #map{storage = ReturnedArray, occupied = Occupied + 1}
     end.
 
 get_value(Key, Map) ->
@@ -89,28 +91,26 @@ fold(Func, InitAcc, Map) ->
 %% so if Map1 and Map2 have two equal keys, value of Map2 is stored
 merge(Map1, Map2) ->
     #map{storage = Array2} = Map2,
-    array:sparse_foldl(
-        fun(_, {Key2, Value2}, Acc) ->
-            add_elem(Key2, Value2, remove_elem(Key2, Acc))
-        end,
-        Map1,
-        Array2
-    ).
+    array:sparse_foldl(fun(_, {Key2, Value2}, Acc) ->
+                          add_elem(Key2, Value2, remove_elem(Key2, Acc))
+                       end,
+                       Map1,
+                       Array2).
 
 is_equal(Map1, Map2) when Map1#map.occupied == Map2#map.occupied ->
     #map{storage = Array1} = Map1,
-    array:sparse_foldl(
-        fun(_, {Key, Value}, Acc) ->
-            case get_value(Key, Map2) of
-                Value -> Acc;
-                _ -> false
-            end
-        end,
-        true,
-        Array1
-    );
-is_equal(_, _) -> false.
-
+    array:sparse_foldl(fun(_, {Key, Value}, Acc) ->
+                          case get_value(Key, Map2) of
+                              Value ->
+                                  Acc;
+                              _ ->
+                                  false
+                          end
+                       end,
+                       true,
+                       Array1);
+is_equal(_, _) ->
+    false.
 
 calc_occupied_values(Array) ->
     array:sparse_foldl(fun(_, _, Acc) -> Acc + 1 end, 0, Array).
@@ -187,4 +187,5 @@ from_list(Map, [Elem | Tail]) ->
     {Key, Value} = Elem,
     NewMap = add_elem(Key, Value, Map),
     from_list(NewMap, Tail);
-from_list(Map, []) -> Map.
+from_list(Map, []) ->
+    Map.

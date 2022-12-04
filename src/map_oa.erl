@@ -31,9 +31,9 @@ add_elem(Key, Value, #map{storage = Array, occupied = Occupied}) ->
                 Array
         end,
     case put_elem({Key, Value}, ResizedArray) of
-        {already_exists, ReturnedArray} ->
+        {changed_value, ReturnedArray} ->
             #map{storage = ReturnedArray, occupied = Occupied};
-        {ok, ReturnedArray} ->
+        {new_value, ReturnedArray} ->
             #map{storage = ReturnedArray, occupied = Occupied + 1}
     end.
 
@@ -127,9 +127,9 @@ set_elem(Elem, Array, Index) ->
             Default = array:default(Array),
             case array:get(Index, Array) of
                 Default ->
-                    {ok, array:set(Index, Elem, Array)};
+                    {new_value, array:set(Index, Elem, Array)};
                 {Key, _} ->
-                    {already_exists, Array};
+                    {changed_value, array:set(Index, Elem, Array)};
                 _ ->
                     set_elem(Elem, Array, Index + 1)
             end;

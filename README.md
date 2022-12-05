@@ -45,20 +45,20 @@ __Лабораторная работа №2__
 
 1. __Добавление элемента__
     ```erlang
-    add_elem(Key, Value, #map{storage = Array, occupied = Occupied}) ->
-      ResizedArray =
-          case Occupied / array:size(Array) > ?LOAD_FACTOR of
-              true ->
-                  grow_array(Array);
-              false ->
-                  Array
-          end,
-      case put_elem({Key, Value}, ResizedArray) of
-          {already_exists, ReturnedArray} ->
-              #map{storage = ReturnedArray, occupied = Occupied};
-          {ok, ReturnedArray} ->
-              #map{storage = ReturnedArray, occupied = Occupied + 1}
-      end.
+   add_elem(Key, Value, #map{storage = Array, occupied = Occupied}) ->
+       ResizedArray =
+           case Occupied / array:size(Array) > ?LOAD_FACTOR of
+               true ->
+                   grow_array(Array);
+               false ->
+                   Array
+           end,
+       case put_elem({Key, Value}, ResizedArray) of
+           {changed_value, ReturnedArray} ->
+               #map{storage = ReturnedArray, occupied = Occupied};
+           {new_value, ReturnedArray} ->
+               #map{storage = ReturnedArray, occupied = Occupied + 1}
+       end.
     ```
 2. __Удаление элемента__
    ```erlang
